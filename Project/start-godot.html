@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>ℱreεβΘΘκ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body class="sub-page">
+  <header>
+      <div class="header-row">
+        <h1 class="site-title">
+          <a href="../Main.html">ℱreεβΘΘκ</a>
+        </h1>
+        <nav class="breadcrumb">
+          <a href="../Main.html">ホーム</a> /
+          <a href="#" class="open-panel" data-target="panel-red">プロジェクト</a> /
+          <span class="article-title"></span>
+        </nav>
+      </div>
+  </header>
+
+  <div class="category-labels">
+    <div class="label-container" data-target="panel-red">
+      <div class="label-background G_red"></div>
+      <div class="label-foreground red">プロジェクト</div>
+    </div>
+    <div class="label-container" data-target="panel-orange">
+      <div class="label-background G_orange"></div>
+      <div class="label-foreground orange">ツール</div>
+    </div>
+    <div class="label-container" data-target="panel-yellow">
+      <div class="label-background G_yellow"></div>
+      <div class="label-foreground yellow">芸術</div>
+    </div>
+    <div class="label-container" data-target="panel-green">
+      <div class="label-background G_green"></div>
+      <div class="label-foreground green">UI</div>
+    </div>
+    <div class="label-container" data-target="panel-blue">
+      <div class="label-background G_blue"></div>
+      <div class="label-foreground blue">スクリプト</div>
+    </div>
+    <div class="label-container" data-target="panel-purple">
+      <div class="label-background G_purple"></div>
+      <div class="label-foreground purple">そのほか</div>
+    </div>
+  </div>
+
+  <div id="global-panels"></div>
+
+  <div class="layout">
+
+    <aside id="related-articles">
+      <h3>関連</h3>
+      <ul>
+        <li><a href="#"></a></li>
+        <li><a href="#"></a></li>
+        <li><a href="#"></a></li>
+      </ul>
+    </aside>
+
+    <main>
+      <h1>⚙️Godotを始めました</h1>
+      <p>更新日時：2025/06/22</p>
+      <br>
+      <p>始めやすいゲームエンジンとして知られています。</p>
+    </main>
+
+  </div>
+
+  <footer>
+    &copy; 2025 jiyuuchou / minoru-gthb | <a href="https://github.com/minoru-gthb">GitHub</a>
+  </footer>
+
+  <script src="../js/main.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const currentUrl = location.pathname;
+
+      fetch("/articles.json")
+        .then(res => res.json())
+        .then(articles => {
+          const currentArticle = articles.find(article => article.url === currentUrl);
+          if (!currentArticle) return;
+
+          const title = currentArticle.title;
+
+          document.querySelectorAll(".article-title").forEach(el => {
+            el.textContent = title;
+          });
+
+        });
+    });
+  </script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const currentUrl = location.pathname;
+      
+      fetch("/articles.json")
+        .then(res => res.json())
+        .then(articles => {
+          const currentArticle = articles.find(article => article.url === currentUrl);
+          if (!currentArticle) return;
+          const currentTags = currentArticle.tags;
+
+          const related = articles
+            .filter(article =>
+              article.url !== currentUrl &&
+              article.tags.some(tag => currentTags.includes(tag))
+            )
+            .map(article => {
+              const sharedTags = article.tags.filter(tag => currentTags.includes(tag));
+              return {
+                ...article,
+                score: sharedTags.length  // 共通タグの数をスコアとする
+              };
+            })
+            .sort((a, b) => b.score - a.score);  // スコアが高い順にソート
+          
+          const container = document.getElementById("related-articles");
+          if (related.length > 0) {
+            const ul = document.createElement("ul");
+            related.forEach(article => {
+              const li = document.createElement("li");
+              const a = document.createElement("a");
+              a.href = article.url;
+              a.textContent = article.title;
+              li.appendChild(a);
+              ul.appendChild(li);
+            });
+            // 既存のリストを置き換え
+            container.querySelector("ul").replaceWith(ul);
+          }
+        });
+    });
+  </script>
+</body>
+</html>
+
